@@ -20,6 +20,8 @@
 # -DSTATIC=ON            : Enable static building of Quassel. Use with care.
 # -DDEPLOY=ON            : Mac OS X only. Use only for creating Quassel Packages!
 #
+# -DCUSTOM_SPELLER=(ON|OFF|FORCED) : FORCED/OFF: always/never use, ON (default): use if KDE is not available.
+#
 # -DWITH_QT5=ON          : Enable (very) experimental support for Qt5 (see doc/README.Qt5!)
 #
 # NOTE: You should remove CMakeCache.txt if you plan to change any of these values!
@@ -56,6 +58,8 @@ option(WITH_LIBINDICATE "Enable Ayatana notification support"           ON)
 option(WITH_KDE      "Enable KDE4 integration"				OFF)
 option(WITH_CRYPT    "Enable encryption support if present on system"	ON)
 option(WITH_SYSLOG   "Use syslog for storing log data"			ON)
+
+option(CUSTOM_SPELLER "Fallback for KDE speller (accepts: ON|OFF|FORCED)" ON)
 
 # We use icon paths from KDE 4.3.x, which are partially invalid on older and possibly
 # even on newer KDE versions. Do not disable this unless you are sure that your Quassel will
@@ -432,6 +436,25 @@ if(BUILD_GUI)
       /System/Library/Frameworks/Foundation.framework
     )
   endif()
+
+  # CUSTOM_SPELLER:
+  # ON     : (Default) Use the custom speller as fallback to KDE's speller
+  # OFF    : Don't use custom speller (-> no speller if not HAVE_KDE)
+  # FORCED : Force custom speller regardless of HAVE_KDE
+  if(HAVE_KDE OR CUSTOM_SPELLER)
+    set(HAVE_SPELLER 1)
+    add_definitions(-DHAVE_SPELLER)
+
+    if(NOT HAVE_KDE OR CUSTOM_SPELLER STREQUAL FORCED)
+      set(CUSTOM_SPELLER 1)
+      add_definitions(-DCUSTOM_SPELLER)
+    endif(NOT HAVE_KDE OR CUSTOM_SPELLER STREQUAL FORCED)
+
+  else(HAVE_KDE OR CUSTOM_SPELLER)
+    remove_definitions(-DHAVE_SPELLER -DCUSTOM_SPELLER)
+  endif(HAVE_KDE OR CUSTOM_SPELLER)
+  message(STATUS "HAVE_SPELLER: '${HAVE_SPELLER}' (CUSTOM_SPELLER: '${CUSTOM_SPELLER}')")
+
 endif(BUILD_GUI)
 
 # Core-only deps

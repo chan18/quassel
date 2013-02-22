@@ -247,6 +247,8 @@ private:
     };
     WebPreview webPreview;
 #endif // HAVE_WEBKIT
+
+    void* _pSpeller;
 };
 
 

@@ -25,8 +25,13 @@ InputWidgetSettingsPage::InputWidgetSettingsPage(QWidget *parent)
 {
     ui.setupUi(this);
 
-#ifndef HAVE_KDE
+#ifndef HAVE_SPELLER
     ui.enableSpellCheck->hide();
+#endif
+
+#ifndef CUSTOM_SPELLER
+    ui.enableThesaurus->hide();
+    ui.thesaurusSpacer->changeSize(0,0);//else it creates a vertical blank space (and a spacer doesn't have a 'hide' method)
 #endif
 
     initAutoWidgets();
