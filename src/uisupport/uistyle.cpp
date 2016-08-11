@@ -234,7 +234,8 @@ QVariant UiStyle::bufferViewItemData(const QModelIndex &index, int role) const
     fmt.merge(_listItemFormats.value(fmtType));
 
     BufferInfo::ActivityLevel activity = (BufferInfo::ActivityLevel)index.data(NetworkModel::BufferActivityRole).toInt();
-    if (activity & BufferInfo::Highlight) {
+    // For query buffers list view, on "plain" new message -> highlight as if a highlight rule was met at the buffer.
+    if (activity & BufferInfo::Highlight || (type == BufferInfo::QueryBuffer && (activity & BufferInfo::NewMessage))) {
         fmt.merge(_listItemFormats.value(BufferViewItem | HighlightedBuffer));
         fmt.merge(_listItemFormats.value(fmtType | HighlightedBuffer));
     }
